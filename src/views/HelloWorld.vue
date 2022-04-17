@@ -1,27 +1,27 @@
 <template>
-  <div>
-
-    <el-card v-if="visable"
-             style="">
-      <h1>人脸识别demo</h1>
-      <p><i class="el-icon-refresh"></i>提示：模型最初校验与重新校验时可能会稍慢，请耐心等候，或刷新界面重启</p>
-    </el-card>
-    <div>
-      <div class="imagebox">
-        <img v-for="item in images"
-             :key="item.id"
-             :src="item.path"
-             alt=""
-             height="80px"
-             width="100px">
-      </div>
+  <div class="home">
+    <div class="classLogoBox">
+      <img src="../assets/logo.png"
+           alt="">
+      <div class="slogan">{{ words.join("") }}</div>
     </div>
 
-    <canvas id="webgl2"
+    <canvas style="display:none"
+            id="webgl2"
             width="400"
             height="300"></canvas>
-    <el-card>
+    <el-card style="background-color: #fefcef;">
       <div id="box">
+        <div class="imagebox">
+          <img v-for="(item,index) in images"
+               :key="item.id"
+               :src="item.path"
+               :alt="item.id"
+               :title="item.id"
+               @click="change(index)"
+               height="80px"
+               width="100px">
+        </div>
         <div class="box1">
           <video id="video"
                  width="400"
@@ -35,25 +35,10 @@
                   width="400"
                   height="300"></canvas>
         </div>
-        <div class="box3">
-          <h1>摄像头<i class="el-icon-loading"></i></h1>
-        </div>
-        <div class="box3">
-          <h1><i class="el-icon-loading"></i>模型</h1>
-        </div>
-        <div class="box2">
-          <canvas id="model"
-                  width="400"
-                  height="300"></canvas>
-
-        </div>
       </div>
     </el-card>
 
-    <el-card>
-      <el-tag type="primary">
-        点击获取脸部坐标按钮，将打印其中10个点于下列表中:
-      </el-tag>
+    <el-card style="background-color: #fefcef;">
       <p id="positions"></p>
       <div class="button-container">
         <el-button type="success"
@@ -61,12 +46,7 @@
         <el-button type="warning"
                    id="liveEnd">关闭摄像头</el-button>
         <el-button type="primary"
-                   id="snap">脸部跟踪开启</el-button>
-        <el-button type="primary"
-                   id="clmStart">获取脸部坐标</el-button>
-        <el-button type="info"
-                   id="console"
-                   @click="consoleData()">控制台输出一组数据</el-button>
+                   id="snap">开始换脸</el-button>
       </div>
     </el-card>
   </div>
@@ -78,36 +58,37 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
-      msg: 'Welcome to Your Vue.js App',
+      words: [], //字母数组push，pop的载体
+      str: 'FA-KE-CE', //str初始化
+      letters: [], //str分解后的字母数组
+
       video: '',
       canvas: '',
       ctx: '',
       ctracker: '',
       visable: true,
       images: [
-        { id: 'average', path: '/static/media/average2_crop.jpg' },
-        { id: 'terminator', path: '/static/media/terminator_crop.jpg' },
-        { id: 'walter2', path: '/static/media/walter2_crop.jpg' },
+        { id: 'average', path: './static/media/average2_crop.jpg' },
+        { id: 'terminator', path: './static/media/terminator_crop.jpg' },
+        { id: 'walter2', path: './static/media/walter2_crop.jpg' },
         {
           id: 'clooney2',
-          path: '/static/media/fragrance-George-Clooney-main_crop.jpg',
+          path: './static/media/fragrance-George-Clooney-main_crop.jpg',
         },
-        { id: 'bieber', path: '/static/media/Justin-Bieber2_crop.jpg' },
-        { id: 'kim', path: '/static/media/kim1_crop.jpg' },
-        { id: 'rihanna', path: '/static/media/ri_1_crop.jpg' },
-        { id: 'audrey', path: '/static/media/audrey_crop.jpg' },
-        { id: 'bill', path: '/static/media/bill-murray-snl_crop.jpg' },
-        { id: 'connery2', path: '/static/media/sean_guru2_crop.jpg' },
-        { id: 'cage3', path: '/static/media/cage2_crop.jpg' },
-        { id: 'queen', path: '/static/media/queen20_crop.jpg' },
+        { id: 'bieber', path: './static/media/Justin-Bieber2_crop.jpg' },
+        { id: 'kim', path: './static/media/kim1_crop.jpg' },
+        { id: 'rihanna', path: './static/media/ri_1_crop.jpg' },
+        { id: 'audrey', path: './static/media/audrey_crop.jpg' },
+        { id: 'bill', path: './static/media/bill-murray-snl_crop.jpg' },
+        { id: 'connery2', path: './static/media/sean_guru2_crop.jpg' },
+        { id: 'cage3', path: './static/media/cage2_crop.jpg' },
+        { id: 'queen', path: './static/media/queen20_crop.jpg' },
         {
           id: 'obama4',
-          path: '/static/media/obama4_crop.jpg',
+          path: './static/media/obama4_crop.jpg',
         },
-        { id: 'chuck', path: '/static/media/chuck_crop.jpg' },
-        { id: 'monalisa', path: '/static/media/joconde_crop.jpg' },
-        { id: 'picasso1', path: '/static/media/picasso_drawing_crop.jpg' },
-        { id: 'scream', path: '/static/media/scream_crop.jpg' },
+        { id: 'chuck', path: './static/media/chuck_crop.jpg' },
+        { id: 'monalisa', path: './static/media/joconde_crop.jpg' },
       ],
       masks: {
         average: [
@@ -913,152 +894,7 @@ export default {
           [183.61325430243852, 59.696924337487069],
           [203.36282510792634, 59.961322827348759],
         ],
-        picasso1: [
-          [36.250450718573873, 79.124566327720288],
-          [35.119608310582322, 96.597861806811181],
-          [36.404659318616737, 113.76840192150527],
-          [38.224159134985243, 131.11062469484807],
-          [44.454529797225646, 154.1814209057838],
-          [58.375246123280007, 169.49596919632819],
-          [72.97988779636654, 180.23977668215664],
-          [87.756188367409294, 185.56552853643095],
-          [105.03241234408378, 180.51444743653224],
-          [122.265469633262, 174.06398165224769],
-          [135.31714855705121, 162.76762378894259],
-          [146.88777632654526, 149.70727178445324],
-          [150.20000560168543, 129.10862928363522],
-          [152.56739151849726, 107.17828639825538],
-          [157.91289561898384, 85.214768152427581],
-          [153.62665196335627, 77.105422620440464],
-          [141.61928142399029, 70.524665935976373],
-          [126.595892772441, 69.905523578840757],
-          [116.49010775841327, 73.31386968143282],
-          [49.0086575832958, 70.235265794279542],
-          [62.701753537480243, 60.550337510943265],
-          [82.1035199652176, 62.144635165724765],
-          [94.457612858326257, 69.990264611588202],
-          [55.814352473139024, 86.02727936226367],
-          [71.316173892786423, 81.800811911371824],
-          [88.080400330799591, 88.20180782468745],
-          [70.246724559943019, 94.071810094606263],
-          [71.121648446471397, 85.582545703028842],
-          [148.10348497461655, 92.462063312908725],
-          [133.05192015872387, 83.73718604655916],
-          [116.27558519146325, 91.192600450046228],
-          [131.88263279775612, 98.993646865368106],
-          [131.78123048704896, 89.404774477148408],
-          [105.51315626215361, 81.569662962447211],
-          [96.191534478817118, 120.50668746252984],
-          [90.199164697849596, 125.37517630957703],
-          [93.463243841115599, 129.51593720857423],
-          [103.40246819387983, 129.77184869247793],
-          [112.65390571265101, 129.56664287134106],
-          [113.58273157049868, 125.83472002370991],
-          [112.97511629728987, 120.82815243119251],
-          [106.03098831604788, 102.16807129228334],
-          [98.211706690369823, 127.97534492896636],
-          [107.00121682175407, 128.76139115375773],
-          [81.658108662587608, 148.26923759836396],
-          [92.806273612808184, 144.41797262560891],
-          [98.041354041956538, 142.78033417226806],
-          [102.38978597981389, 145.68476515395253],
-          [106.77039887493248, 144.55888963561441],
-          [111.2028829073426, 146.72397791119556],
-          [118.41047414259552, 151.37431914236606],
-          [114.09050148249918, 153.5845427811754],
-          [108.26749560913638, 155.60812550724742],
-          [101.03855866647899, 155.85689374282265],
-          [94.667308403540687, 154.21614129562002],
-          [88.606207885913079, 152.3634368283987],
-          [94.799176802224451, 147.78175686140321],
-          [101.61589425206924, 148.37134474983333],
-          [110.19810766615751, 149.17710215768849],
-          [110.00140558086673, 149.42392294958483],
-          [101.78004560465695, 147.81385618194679],
-          [94.666393329457804, 147.88634305613706],
-          [104.96348601661472, 123.47557663615419],
-          [63.067424126991767, 83.412995811464754],
-          [79.698359035226673, 82.50077801608326],
-          [80.163162608568456, 92.634906745609783],
-          [62.531657767831675, 91.548319806853101],
-          [142.57740074574272, 88.097933442704544],
-          [123.16502620504644, 85.963352957311599],
-          [123.58158606810653, 97.591877049766168],
-          [140.99420788006387, 96.726951520247638],
-        ],
-        scream: [
-          [31.036290655849882, 57.432857152986685],
-          [36.834032422703402, 76.616090763423301],
-          [44.144879197624306, 91.506035663960802],
-          [56.746870626966768, 106.12350665968165],
-          [63.525573844882473, 121.99269842503458],
-          [69.2934094352062, 141.18816557433274],
-          [79.116034591995231, 158.27345628505338],
-          [95.444768276521444, 157.85798622717158],
-          [112.1506100202503, 149.53119369985041],
-          [120.19223108149427, 133.77442783766503],
-          [120.98364439956012, 118.34214249063547],
-          [126.09006592863452, 102.16079319696235],
-          [136.11638867777555, 90.042725252145431],
-          [143.07386026688062, 75.600333966055501],
-          [143.83480182971522, 54.469443259083619],
-          [133.78044168407791, 38.927078049915451],
-          [116.88883196831546, 29.805997108581423],
-          [100.37012716461871, 31.831740142580585],
-          [85.39723434749834, 42.341129078554331],
-          [40.717793723347995, 43.305563127634542],
-          [48.744681128699852, 37.771923766655192],
-          [57.448931896748704, 36.028754590906701],
-          [67.464345519404787, 36.944607085351322],
-          [45.385363552887199, 58.225754147134666],
-          [54.363960101074014, 47.630931768034003],
-          [68.011017790419004, 54.583990783711471],
-          [58.120050008047329, 62.745638214068549],
-          [55.616718436597296, 53.995790698964527],
-          [122.66684453667131, 54.6831401033742],
-          [110.90016888640474, 45.569147756531351],
-          [96.234198458489033, 53.677715067572848],
-          [108.49190790972344, 62.644313336393992],
-          [110.33329194240295, 54.935130623390222],
-          [80.887741592339665, 51.027213274581243],
-          [76.364796231779138, 68.40676367915853],
-          [71.204026202304306, 77.172050050826158],
-          [75.730620606370721, 82.644032983592723],
-          [87.363757439691426, 80.118716444055792],
-          [98.704261825861266, 80.021192400105463],
-          [100.92981427616351, 75.460833622671146],
-          [93.832797746290964, 66.709039647758487],
-          [82.448627671183701, 59.880239108276982],
-          [78.635928103659296, 73.849587320332546],
-          [92.627257877148452, 73.43767426025039],
-          [79.131242507468116, 114.47649461874275],
-          [77.082061781015526, 104.8161820064411],
-          [76.86256899541047, 91.51976352151155],
-          [84.492130686253887, 87.376289229573757],
-          [89.954070974658805, 90.754539182117583],
-          [96.555921994018263, 100.64436225867991],
-          [98.440888036356, 112.45487645254397],
-          [99.900677251741001, 118.69433160303333],
-          [97.588402646172568, 124.71623282477302],
-          [91.597980889907518, 126.41777298016024],
-          [84.533931967288538, 127.61556713904764],
-          [79.240345390611509, 121.19778971162847],
-          [83.178935170207694, 120.97334887551744],
-          [90.622988915812243, 121.32946906512535],
-          [95.211974749360394, 119.17107481925299],
-          [90.610722471562042, 96.597036966133828],
-          [85.032665543272103, 94.424007443444765],
-          [80.833795006309913, 101.09683414893499],
-          [85.305504524124245, 72.452653823137268],
-          [48.8748794470348, 52.429091513207823],
-          [63.68702721228027, 48.108214917609644],
-          [66.062515145830616, 60.166087383119986],
-          [51.2501982134619, 62.489540249221989],
-          [117.78390022622665, 48.625670298558617],
-          [103.06761868980499, 48.623588434563402],
-          [101.36381278664584, 59.660098601097076],
-          [117.07959483560742, 60.662984572138043],
-        ],
+
         terminator: [
           [29.076884732031772, 71.67890495708096],
           [27.66651993257193, 111.97958383082613],
@@ -1406,13 +1242,14 @@ export default {
         [58, 59, 57, 58],
         [58, 59, 50, 58],
       ],
-      currentMask: 12,
+      currentMask: 7,
       imageCanvases: {},
       imageCount: 0,
     }
   },
   mounted() {
     this.initVideo()
+    this.begin()
 
     //load masks
     for (let i = 0; i < this.images.length; i++) {
@@ -1420,6 +1257,50 @@ export default {
     }
   },
   methods: {
+    change(id) {
+      this.currentMask = id
+    },
+    begin() {
+      this.letters = this.str.split('')
+      for (var i = 0; i < this.letters.length; i++) {
+        setTimeout(this.write(i), i * 100)
+      }
+    },
+    //开始删除的效果动画
+    back() {
+      let L = this.letters.length
+      for (var i = 0; i < L; i++) {
+        setTimeout(this.wipe(i), i * 50)
+      }
+    },
+    //输入字母
+    write(i) {
+      return () => {
+        let L = this.letters.length
+        this.words.push(this.letters[i])
+        let that = this
+        /*如果输入完毕，在2s后开始删除*/
+        if (i == L - 1) {
+          setTimeout(function () {
+            that.back()
+          }, 2000)
+        }
+      }
+    },
+    //擦掉(删除)字母
+    wipe(i) {
+      return () => {
+        this.words.pop(this.letters[i])
+        /*如果删除完毕，在300ms后开始输入*/
+        if (this.words.length == 0) {
+          this.order++
+          let that = this
+          setTimeout(function () {
+            that.begin()
+          }, 300)
+        }
+      }
+    },
     loadMask(index) {
       let mask = new Image()
       const _this = this
@@ -1438,15 +1319,8 @@ export default {
     },
 
     initVideo() {
-      console.log(
-        '%cHelloWorld.vue line:1417 object',
-        'color: #007acc;',
-        pModel
-      )
       this.video = document.getElementById('video')
       this.canvas = document.getElementById('canvas')
-      console.log(this.video)
-      console.log(this.canvas)
       this.ctx = canvas.getContext('2d') //参数 contextID 指定了您想要在画布上绘制的类型。当前唯一的合法值是 "2d"
       let width = video.width
       let height = video.height
@@ -1509,7 +1383,6 @@ export default {
         )
 
       // we need to extend the positions with new estimated points in order to get pixels immediately outside mask
-      console.log(this.images[this.currentMask])
       let newMaskPos = this.masks[this.images[this.currentMask].id].slice(0)
       let newFacePos = pos.slice(0)
       let extInd = [
@@ -1598,7 +1471,6 @@ export default {
     },
 
     liveVideo(width, height) {
-      console.log(video)
       const _this = this
       let URL = window.URL || window.webkitURL // 获取到window.URL对象
       navigator.getUserMedia(
@@ -1615,13 +1487,9 @@ export default {
               function drawLoop() {
                 requestAnimationFrame(drawLoop)
                 _this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-
+                console.log(_this.ctracker.getCurrentPosition())
                 _this.switchMasks(_this.ctracker.getCurrentPosition())
                 _this.ctracker.draw(canvas)
-                let model = document.getElementById('model')
-                let ctx2 = model.getContext('2d')
-                ctx2.clearRect(0, 0, model.width, model.height)
-                _this.ctracker.draw(model)
               }
               drawLoop()
             })
@@ -1629,7 +1497,6 @@ export default {
             .getElementById('liveEnd')
             .addEventListener('click', function () {
               video.pause()
-              console.log(stream)
               stream.getVideoTracks()[0].stop()
               video.src = ''
             })
@@ -1639,64 +1506,14 @@ export default {
         }
       )
     },
-    initClmTrackr() {
+    async initClmTrackr() {
       const _this = this
       let ctracker = new clm.tracker()
-      this.ctracker = ctracker
-      ctracker.init()
-      ctracker.start(this.video)
       console.log(ctracker)
-      document
-        .getElementById('clmStart')
-        .addEventListener('click', function () {
-          console.log('开始跟踪了')
-          function positionLoop() {
-            requestAnimationFrame(positionLoop)
-            let positions = ctracker.getCurrentPosition()
-            // do something with the positions ...
-            // print the positions
-            let positionString = ''
-            if (positions) {
-              for (let p = 0; p < 10; p++) {
-                positionString +=
-                  'featurepoint ' +
-                  p +
-                  ' : [' +
-                  positions[p][0].toFixed(2) +
-                  ',' +
-                  positions[p][1].toFixed(2) +
-                  ']<br/>'
-              }
-              document.getElementById('positions').innerHTML = positionString
-            }
-          }
-          positionLoop()
-        })
-    },
-    consoleData() {
-      const _this = this
-      function positionLoop() {
-        // requestAnimationFrame(positionLoop);
-        let positions = _this.ctracker.getCurrentPosition()
-        console.log(positions)
-        // do something with the positions ...
-        // print the positions
-        let positionString = ''
-        if (positions) {
-          for (let p = 0; p < 10; p++) {
-            positionString +=
-              'featurepoint ' +
-              p +
-              ' : [' +
-              positions[p][0].toFixed(2) +
-              ',' +
-              positions[p][1].toFixed(2) +
-              ']<br/>'
-          }
-          document.getElementById('positions').innerHTML = positionString
-        }
-      }
-      positionLoop()
+      console.log(this.video)
+      ctracker.init()
+      const a = await ctracker.start(this.video)
+      this.ctracker = ctracker
     },
   },
 }
@@ -1704,30 +1521,92 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+@import url('../style.css');
+
+.home {
+  padding-top: 150px;
+  background-color: #fefcef;
+}
+.classLogoBox {
+  width: 100vw;
+  height: 150px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: fixed;
+  background-color: #fefcef;
+
+  top: 0;
+}
+.red {
+  color: #bf0111;
+}
+.slogan {
+  margin-left: 30px;
+  font-family: 'sporter';
+  height: 50px;
+  line-height: 50px;
+  font-size: 5rem;
+  color: #333;
+  animation: blink-caret 1s infinite;
+  border-right: 5px solid transparent;
+}
+/* 光标闪啊闪 */
+@keyframes blink-caret {
+  from,
+  to {
+    border-right: 5px solid #bf0111;
+  }
+  50% {
+    border-right: 5px solid #bf011100;
+  }
+}
+.classLogoBox img {
+  height: 60%;
+  background-color: #fefcef;
+  border: 5px solid #333;
+  border-radius: 50%;
+  position: relative;
+  margin-left: 20px;
+}
 .imagebox {
   display: flex;
+  width: 400px;
+  margin-left: 150px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: space-around;
 }
 .imagebox img {
   display: inline-block;
-  width: 100px;
-  height: 80px;
+  width: 75px;
+  height: 70px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px #888888;
 }
 #box {
   width: 100%;
+  background-color: #fefcef;
+
   height: 350px;
   display: flex;
 }
 .box1 {
+  background-color: #fefcef;
+
   position: relative;
   width: 50%;
   flex: 4;
 }
 .box3 {
+  background-color: #fefcef;
   flex: 1;
   text-align: center;
   line-height: 300px;
 }
 .box2 {
+  background-color: #fefcef;
+
   position: relative;
   width: 50%;
   flex: 4;
@@ -1739,6 +1618,7 @@ export default {
   transform: translate(-50%, -50%);
   border: 1px solid #ccc;
   border-radius: 20px;
+  box-shadow: 5px 5px 10px #8d8d8d;
 }
 #model {
   position: absolute;
@@ -1769,6 +1649,7 @@ export default {
   z-index: 1000;
 }
 .button-container {
+  background-color: #fefcef;
 }
 hiddenCard {
   visibility: hidden;

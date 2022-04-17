@@ -12,6 +12,8 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "clmtrackr": "^1.1.2",
+    "electron": "^18.0.4",
+    "electron-builder": "^23.0.3",
     "element-ui": "^2.3.8",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"

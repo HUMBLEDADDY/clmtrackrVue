@@ -23,41 +23,20 @@
     <div class="trueLogoBox imgBox animation-logoJump">
       <img src="../assets/logo.png"
            class="Mobius animation-slide-bottom"
-           :style="{}"
            alt="" />
     </div>
-    <div class="login">
-      <el-input class="input"
-                v-model="user"
-                placeholder="请输入账号"></el-input>
-      <br />
-      <el-input class="input"
-                placeholder="请输入密码"
-                v-model="password"
-                show-password></el-input>
-      <br />
-      <a style="
-          color: #333;
-          font-weight: bold;
-          font-size: small;
-          font-family: 'shoujin';
-        "
-         @click="change()">{{ atext }}</a>
-      <br />
-      <button type="reset"
-              class="btn"
-              @click="clear()">
-        <span class="btntext">清空</span>
-        <div class="wave"></div>
-      </button>
-      <button type="button"
-              class="btn">
-        <span class="btntext"
-              id="login"
-              @click="login()">{{ btn }}</span>
-      </button>
+
+    <el-button @click="start"
+               class="start"> S T A R T </el-button>
+    <div class="bigSlogon">
+      <p>FA<span>-</span>KE<span>-</span>CE<span>.</span></p>
+    </div>
+    <div class="smallSlogon">
+      <p>FA KE CE<span class="red">.</span></p>
+      <div class="redline"></div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -69,7 +48,7 @@ export default {
       status: 1,
       user: '111',
       password: '111',
-      slogan: '安疫',
+      slogan: 'FA-KE-CE',
       Mobius: [
         { top: '9vh', left: '5vw', size: 1.5 },
         { top: '31vh', left: '2vw', size: 0.7 },
@@ -108,58 +87,8 @@ export default {
     }
   },
   methods: {
-    change() {
-      if (this.status == 1) {
-        this.status = 2
-        this.btn = '注册'
-        this.atext = '已有账号，去登录'
-      } else if (this.status == 2) {
-        this.status = 1
-        this.btn = '登录'
-        this.atext = '还没有账号，去注册'
-      }
-    },
-    clear() {
-      this.user = ''
-      this.password = ''
-    },
-    async login() {
-      if (this.status == 1) {
-        const res = await this.$http.post('/user/login', {
-          user: this.user,
-          password: this.password,
-        })
-        console.log(res)
-        localStorage.token = res.data.token
-        if (res.status == 200) {
-          this.$message({
-            type: 'success',
-            message: '登录成功',
-          })
-          this.$router.push('/')
-        } else if (res.status == 201) {
-          this.$message.error('用户名是不是输错了？')
-        } else if (res.status == 202) {
-          this.$message.error('密码是不是输错了？')
-        }
-      } else if (this.status == 2) {
-        const res = await this.$http.post('/user/register', {
-          user: this.user,
-          password: this.password,
-        })
-        console.log(res)
-        localStorage.token = res.data.token
-        if (res.status == 200) {
-          this.$message({
-            type: 'success',
-            message: '注册成功，正在自动为您登录',
-          })
-          this.change()
-          this.login()
-        } else if (res.status == 201) {
-          this.$message.error('用户名已经被使用了哦')
-        }
-      }
+    start() {
+      this.$router.push('/home')
     },
   },
 }
@@ -167,22 +96,24 @@ export default {
 
 <style  scoped>
 @import url('../style.css');
+
 .main {
   width: 100vw;
   height: 100vh;
   position: absolute;
-  background-color: #ffffff;
+  background-color: #fefcef;
   overflow: hidden;
   z-index: 99;
 }
 
 .main .slogan {
-  font-family: 'shoujin';
+  font-family: 'sporter';
   text-align: center;
   line-height: 100vh;
   font-size: 5vw;
   font-weight: bolder;
   z-index: 10;
+  color: #000;
 }
 
 @media screen and (max-width: 500px) {
@@ -195,7 +126,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 10vw;
+  width: 5vw;
 }
 
 @media screen and (max-width: 500px) {
@@ -206,6 +137,7 @@ export default {
 
 .main .Mobius {
   width: 100%;
+  border-radius: 50%;
 }
 
 .main .trueLogoBox {
@@ -215,11 +147,11 @@ export default {
   left: 0;
   box-sizing: border-box;
   right: 0;
-  animation: login 0.7s 1.9s, rotate 1s 2.6s;
+  animation: login 0.7s 1.9s, rotate 1s 2.8s;
   animation-fill-mode: forwards;
   z-index: 9;
   border: 3px solid rgba(51, 51, 51, 0);
-  border-radius: 10px;
+  border-radius: 50%;
   pointer-events: none;
 }
 
@@ -294,35 +226,130 @@ export default {
 
 @keyframes rotate {
   0% {
-    transform: perspective(500px) rotateX(0deg);
-    top: 300px;
-  }
-  50% {
-    transform: perspective(500px) rotateX(30deg) scale(1.3);
-    top: 260px;
   }
   100% {
-    transform: perspective(500px) rotateX(0deg) scale(1);
-    top: 110px;
+    border-radius: 50%;
+    top: 120px;
+    left: -20px;
+    width: 100px;
+    border: 5px solid #333;
+    background: #fff;
   }
 }
 
-.login {
-  width: 23%;
-  height: 250px;
-  left: 38.5%;
-  top: 130px;
-  padding-top: 120px;
+.start {
+  left: 46.2%;
+  top: 530px;
   text-align: center;
-  border-radius: 5px;
+  border-radius: 10px;
+  border: 6px solid #000;
   position: absolute;
-  background-color: #fdfaf3;
-  box-shadow: 5px 5px 20px #c5c5c5;
-  animation: loginin 1s 3.1s;
+  background: #fff;
+  z-index: 99999999999;
+  color: #bf0111;
+  font-weight: bolder;
+  box-shadow: 5px 5px 20px #b3b3b3;
+  animation: loginin 1s 4.3s;
   animation-fill-mode: forwards;
   opacity: 0;
 }
+.bigSlogon {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  line-height: 100vh;
+  animation: loginin 1s 3.3s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+  transform: scale(1.5);
+  font-size: 15vw;
+  top: 0;
+  left: 0;
+}
 
+@keyframes glitch {
+  0% {
+    clip-path: var(--slice-1);
+    transform: translate(-20px, -10px);
+  }
+
+  10% {
+    clip-path: var(--slice-3);
+    transform: translate(10px, 10px);
+  }
+
+  20% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 10px);
+  }
+
+  30% {
+    clip-path: var(--slice-3);
+    transform: translate(0px, 5px);
+  }
+
+  40% {
+    clip-path: var(--slice-2);
+    transform: translate(-5px, 0px);
+  }
+
+  50% {
+    clip-path: var(--slice-3);
+    transform: translate(5px, 0px);
+  }
+
+  60% {
+    clip-path: var(--slice-4);
+    transform: translate(5px, 10px);
+  }
+
+  70% {
+    clip-path: var(--slice-2);
+    transform: translate(-10px, 10px);
+  }
+
+  80% {
+    clip-path: var(--slice-5);
+    transform: translate(20px, -10px);
+  }
+
+  90% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 0px);
+  }
+
+  100% {
+    clip-path: var(--slice-1);
+    transform: translate(0);
+  }
+}
+
+.smallSlogon {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  line-height: 100vh;
+  animation: loginin 1s 3.3s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+  z-index: 999;
+  font-size: 10vw;
+  top: 0;
+  left: 0;
+}
+.smallSlogon p {
+  color: #000;
+  text-shadow: #000000 0 0 0px;
+  font-family: 'sporter';
+  user-select: none;
+}
+.bigSlogon p {
+  color: transparent;
+  text-shadow: #30303025 0 0 0px;
+  font-family: 'sporter';
+}
 .input {
   z-index: 999;
   width: 250px;
@@ -400,5 +427,51 @@ export default {
   animation: changecolorback 1s;
   animation-fill-mode: forwards;
   letter-spacing: 5px;
+}
+.red {
+  color: #bf0111;
+}
+.redline {
+  background: linear-gradient(
+    to right,
+    #bf0111,
+    orange,
+    yellow,
+    orange,
+    #bf0111
+  );
+  position: absolute;
+  height: 20px;
+  width: 176px;
+  z-index: 9999;
+  left: -100px;
+
+  top: 50%;
+  margin-top: -10px;
+  margin-left: -109px;
+  background-size: 1400% 300%;
+  animation: leftin 0.5s 4s, dynamics 5s ease infinite;
+  animation-fill-mode: forwards;
+}
+@keyframes dynamics {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 50% 100%;
+  }
+
+  100% {
+    background-position: 100% 0%;
+  }
+}
+@keyframes leftin {
+  0% {
+    left: -100px;
+  }
+  100% {
+    left: 50%;
+  }
 }
 </style>

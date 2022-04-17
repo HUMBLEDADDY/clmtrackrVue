@@ -51,8 +51,7 @@
 }
 
 .animation-slide-bottom {
-    animation-name: slide-bottom;
-    animation-duration: 1s;
+    animation: 1s slide-bottom;
 }
 
 .animation-slide-bottom-word {
